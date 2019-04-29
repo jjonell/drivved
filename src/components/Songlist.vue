@@ -1,0 +1,109 @@
+<template>
+  <div class="songlist" :class="{ sortable: isSorting }">
+    <div 
+      v-for="song in songs" 
+      :key="song.id" 
+      :data-id="song.id"
+      @click="play(song)" 
+      :class="{ selected: (store.currentSong && store.currentSong.id === song.id) }"
+    >
+      <i class="icon ion-ios-remove-circle remove" @click="remove"></i>
+      <div>
+        {{ song.title }}
+        <span>{{ song.artist }}</span>
+      </div>
+      <i class="icon ion-ios-reorder reorder"></i>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['songs', 'store', 'isSorting'],
+  data () {
+    return {
+      
+    }
+  },
+  methods: {
+    play (song) {
+      this.store.audio.pause();
+      this.store.audio.seek(0);
+      this.store.currentSong = song;
+      this.store.audio.loadSong();
+      this.$nextTick(() => {
+        this.store.player.minimized = false;
+      });
+
+      // save the current songlist to make the prev/next buttons work
+      let children = this.$el.children;
+      this.store.currentSongList = [];
+      for (let i = 0; i < children.length; i++) {
+        this.store.currentSongList.push(children[i].getAttribute('data-id'));
+      }
+    },
+    remove () {
+      alert('not implemented');
+    }
+  },
+  mounted () {
+    
+  }
+}
+</script>
+
+<style lang="less">
+.songlist {
+  > div {
+    display: flex;
+    margin-left: 18px;
+    transition: margin-left 0.3s;
+    border-bottom: 0.5px solid #ccc;
+    background-color: white;
+    min-height: 45px;
+    > div {
+      font-weight: bold;
+      padding: 8px 0;
+      flex: 1;
+      span { 
+        display: block; 
+        font-weight: normal; 
+        font-family: 'Crimson Text';
+        font-style: italic;
+      }
+    }
+    &:last-child {
+      margin-bottom: -1px;
+    }
+    &.selected {
+      color: #ea4e3d;
+    }
+  }
+  .icon {
+    font-size: 22px;
+    padding: 15px;
+  }
+  .remove {
+    margin-left: -51px;
+    width: 51px;
+    box-sizing: border-box;
+    color: #ea4e3d;
+  }
+  .reorder {
+    opacity: 0;
+    color: #aaa;
+    transition: opacity 0.3s;
+  }
+  &.sortable {
+    > div {
+      margin-left: 48px;
+    }
+    .reorder {
+      opacity: 1;
+    }
+  }
+  &.search {
+    top: 100px;
+  }
+}
+</style>
