@@ -4,11 +4,10 @@
       v-for="song in songs" 
       :key="song.id" 
       :data-id="song.id"
-      @click="play(song)" 
       :class="{ selected: (store.currentSong && store.currentSong.id === song.id) }"
     >
-      <i class="icon ion-ios-remove-circle remove" @click="remove"></i>
-      <div>
+      <i class="icon ion-ios-remove-circle remove" @click="remove(song)"></i>
+      <div @click="play(song)">
         {{ song.title }}
         <span>{{ song.artist }}</span>
       </div>
@@ -42,12 +41,26 @@ export default {
         this.store.currentSongList.push(children[i].getAttribute('data-id'));
       }
     },
-    remove () {
-      alert('not implemented');
+    async remove (song) {
+      if (this.$route.name === 'playlist') {
+        if (confirm('Är du säkert på att du vill ta bort den från din spellista?')) {
+          await localDb.playlist.delete(song.id);
+          let index = this.store.playlist.findIndex(id => (song.id));
+          this.store.playlist.splice(index, 1);
+        }
+      }
+      else if (this.store.useradmin && this.$route.name === 'current') {
+        alert('Not implemented');
+        // kryssa bort från "aktuella"
+      }
+      
+      /*
+      await localDb.playlist.delete(this.store.currentSong.id);
+      this.isInPlaylist = false;
+      let index = this.store.playlist.findIndex(id => (this.store.currentSong.id));
+      this.store.playlist.splice(index, 1);
+      */
     }
-  },
-  mounted () {
-    
   }
 }
 </script>

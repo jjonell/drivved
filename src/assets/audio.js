@@ -28,13 +28,14 @@ export default {
 		let blob;
 		if (store.playlist.indexOf(song.id) > -1) {
 			let dbItem = await localDb.playlist.get(song.id);
-			if (dbItem.track === store.currentTrack) {
+			let dbTrack = dbItem.tracks.find(track => (track.type === store.currentTrack));
+			if (dbTrack) {
 				if (dbItem.ios) {
 					// already base64 encoded becuase we couldn't store it otherwise
-					blob = dbItem.audio;
+					blob = dbTrack.audio;
 				}
 				else {
-					blob = URL.createObjectURL(dbItem.audio);
+					blob = URL.createObjectURL(dbTrack.audio);
 				}
 			}
 		}
@@ -48,6 +49,7 @@ export default {
 	},
 	loadTrack (track) {
 		this.pause();
+		this.seek(0);
 		store.currentTrack = track.type;
 		this.loadSong();
 	},

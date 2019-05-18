@@ -47,8 +47,8 @@
             ></i>
           </div>
           <div class="tools" v-show="!store.editSheetMusic">
-            <button class="button smallbutton" @click="togglePlaylist" :class="{ active: isInPlaylist }">{{ downloading || 'Spellista' }}</button>
-            <button class="button smallbutton" @click="showFiles = !showFiles;" :class="{ active: showFiles }">Filer</button>
+            <button class="button smallbutton" @click="showFiles = true">Visa filer</button>
+            <button class="button smallbutton" @click="showPlaylist = true" :disabled="isInPlaylist">{{ 'Lägg till i spellistan' }}</button>
             <button class="button smallbutton" @click="isSpeedmode = !isSpeedmode" :class="{ active: isSpeedmode }">Hastighet</button>
             <button class="button smallbutton desktopOnly" @click="store.editing = true;">Redigera</button>
             <button class="button smallbutton desktopOnly" @click="startNoteSync">Synka noter</button>
@@ -59,12 +59,8 @@
             <div class="edgelabel right">Snabbt</div>
             <div class="ticks"><div v-for="step in speedsteps"></div></div>
           </div>
-          <div class="popup files" v-if="showFiles">
-            <p><strong>Filer</strong></p>
-            <p v-for="(file, index) in store.currentSong.files" :key="index">
-              <a href="">{{ file.file }}</a>
-            </p>
-          </div>
+          <file-links v-if="showFiles" :store="store" @close="showFiles = false;" />
+          <add-to-playlist v-if="showPlaylist" :store="store" @close="showPlaylist = false;" />
         </div>
       </div>
     </div>
@@ -73,10 +69,12 @@
 
 <script>
 import SheetMusic from './SheetMusic.vue'
+import FileLinks from './FileLinks.vue'
+import addToPlaylist from './addToPlaylist.vue'
+
 export default {
-  name: 'playlist',
   props: ['store'],
-  components: { SheetMusic },
+  components: { SheetMusic, FileLinks, addToPlaylist },
   data () {
     return {
       progress: 0,
@@ -86,7 +84,7 @@ export default {
       isInPlaylist: false,
       isSpeedmode: false,
       showFiles: false,
-      downloading: ''
+      showPlaylist: false
     }
   },
   watch: {
@@ -98,6 +96,7 @@ export default {
     },
     'store.currentSong' () {
       this.isInPlaylist = (this.store.playlist.indexOf(this.store.currentSong.id) > -1);
+      this.showFiles = false;
     },
     'store.player.currentTime' (time) {
       this.progress = Math.floor(100 * time / this.store.player.duration);
@@ -112,6 +111,7 @@ export default {
       let seconds = '0' + Math.floor(time - (minutes * 60));
       return minutes + ':' + seconds.slice(-2);
     },
+    /*
     async togglePlaylist () {
       if (!this.isInPlaylist) {
         this.addToPlaylist(this.store.currentSong, this.store.currentTrack, this.store.audioObj.src, this.store.sheetMusicUrl);
@@ -123,33 +123,7 @@ export default {
         this.store.playlist.splice(index, 1);
       }
     },
-    async addToPlaylist (song, trackType, audioSrc, pdfSrc) {
-      this.downloading = 'Laddar ner...';
-      try {
-        let item = { id: song.id, track: trackType }
-        let res = await fetch(audioSrc);
-        let blob = await res.blob();
-        if (navigator.userAgent.indexOf('iPhone') > -1 || navigator.userAgent.indexOf('iPad')) {
-          item.ios = true;
-          item.audio = await this.store.fileToBase64(blob);
-        }
-        else {
-          item.audio = blob;
-        }
-        
-        res = await fetch(pdfSrc);
-        blob = await res.blob();
-        item.sheetmusic = await this.store.fileToBase64(blob);
-        
-        await localDb.playlist.put(item);
-        this.isInPlaylist = true;
-        this.store.playlist.push(this.store.currentSong.id);
-      }
-      catch (error) {
-        alert(error);
-      }
-      this.downloading = '';
-    },
+    */
     startNoteSync () {
       this.store.editSheetMusic = true;
       this.store.audio.pause();
@@ -376,26 +350,26 @@ export default {
     position: fixed;
     z-index: 1;
     background: white;
-    bottom: 4rem;
-    left: 50%;
-    margin-left: -150px;
     width: 300px;
-    border: 1px solid #ccc;
-    padding: 0 1rem;
-    border-radius: 5px;
+    padding: 15px;
+    padding-bottom: 60px;
+    border-radius: 7px;
     text-align: left;
-    &:after {
-      content: '';
-      background: #fff;
-      position: absolute;
-      height: 1rem;
-      width: 1rem;
-      border-left: 1px solid #ccc;
-      border-bottom: 1px solid #ccc;
-      bottom: -.5rem;
-      left: 50%;
-      margin-left: -.5rem;
-      transform: rotateZ(-45deg);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.4);
+    button {
+      appearance: none;
+      position: absolute; 
+      bottom: 0;
+      border: 0;
+      background: none;
+      border-top: 1px solid #b5b5b5;
+      color: #007aff;
+      font-size: 17px;
+      height: 44px;
+      line-height: 43px;
     }
   }
 }

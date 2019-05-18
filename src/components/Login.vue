@@ -23,8 +23,7 @@ export default {
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         //firebase.auth.TwitterAuthProvider.PROVIDER_ID,
         //firebase.auth.GithubAuthProvider.PROVIDER_ID,
-        //firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-        firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
+        //firebase.auth.PhoneAuthProvider.PROVIDER_ID
       ],
       requireDisplayName: false
       // tosUrl and privacyPolicyUrl accept either url string or a callback

@@ -222,7 +222,8 @@ header {
 .smallbutton {
   font-size: 12px;
   line-height: 22px;
-  min-width: 80px;
+  min-width: 70px;
+  padding: 0 5px;
   width: auto;
 }
 @media (min-width: 1025px) {
