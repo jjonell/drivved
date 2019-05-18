@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     async save () {
-      this.$emit('close');
+      this.$emit('close', true);
       let song = this.store.currentSong;
       let tmpStorage = firebase.storage(); 
       let item = { id: song.id, tracks: [] }

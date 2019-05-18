@@ -48,7 +48,7 @@
           </div>
           <div class="tools" v-show="!store.editSheetMusic">
             <button class="button smallbutton" @click="showFiles = true">Visa filer</button>
-            <button class="button smallbutton" @click="showPlaylist = true" :disabled="isInPlaylist">{{ 'Lägg till i spellistan' }}</button>
+            <button class="button smallbutton" @click="togglePlaylist">{{ (isInPlaylist ? 'Ta bort från spellistan' : 'Lägg till i spellistan') }}</button>
             <button class="button smallbutton" @click="isSpeedmode = !isSpeedmode" :class="{ active: isSpeedmode }">Hastighet</button>
             <button class="button smallbutton desktopOnly" @click="store.editing = true;">Redigera</button>
             <button class="button smallbutton desktopOnly" @click="startNoteSync">Synka noter</button>
@@ -60,7 +60,7 @@
             <div class="ticks"><div v-for="step in speedsteps"></div></div>
           </div>
           <file-links v-if="showFiles" :store="store" @close="showFiles = false;" />
-          <add-to-playlist v-if="showPlaylist" :store="store" @close="showPlaylist = false;" />
+          <add-to-playlist v-if="showPlaylist" :store="store" @close="closeAddToPlaylist" />
         </div>
       </div>
     </div>
@@ -103,6 +103,12 @@ export default {
     }
   },
   methods: {
+    closeAddToPlaylist(add) {
+      this.showPlaylist = false;
+      if (add) {
+        this.isInPlaylist = true;
+      }
+    },
     seek (perc) {
       this.store.audio.seek(this.store.player.duration * (perc / 100));
     },
@@ -111,19 +117,19 @@ export default {
       let seconds = '0' + Math.floor(time - (minutes * 60));
       return minutes + ':' + seconds.slice(-2);
     },
-    /*
-    async togglePlaylist () {
+    async togglePlaylist() {
       if (!this.isInPlaylist) {
-        this.addToPlaylist(this.store.currentSong, this.store.currentTrack, this.store.audioObj.src, this.store.sheetMusicUrl);
+        this.showPlaylist = true;
       }
       else {
-        await localDb.playlist.delete(this.store.currentSong.id);
-        this.isInPlaylist = false;
-        let index = this.store.playlist.findIndex(id => (this.store.currentSong.id));
-        this.store.playlist.splice(index, 1);
+        if (confirm('Är du säkert på att du vill ta bort den från din spellista?')) {
+          this.isInPlaylist = false;
+          let index = this.store.playlist.indexOf(this.store.currentSong.id);
+          this.store.playlist.splice(index, 1);
+          await localDb.playlist.delete(this.store.currentSong.id);
+        }
       }
     },
-    */
     startNoteSync () {
       this.store.editSheetMusic = true;
       this.store.audio.pause();

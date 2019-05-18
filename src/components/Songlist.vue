@@ -45,7 +45,7 @@ export default {
       if (this.$route.name === 'playlist') {
         if (confirm('Är du säkert på att du vill ta bort den från din spellista?')) {
           await localDb.playlist.delete(song.id);
-          let index = this.store.playlist.findIndex(id => (song.id));
+          let index = this.store.playlist.indexOf(song.id);
           this.store.playlist.splice(index, 1);
         }
       }
@@ -53,13 +53,6 @@ export default {
         alert('Not implemented');
         // kryssa bort från "aktuella"
       }
-      
-      /*
-      await localDb.playlist.delete(this.store.currentSong.id);
-      this.isInPlaylist = false;
-      let index = this.store.playlist.findIndex(id => (this.store.currentSong.id));
-      this.store.playlist.splice(index, 1);
-      */
     }
   }
 }
